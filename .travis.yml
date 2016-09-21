@@ -1,0 +1,61 @@
+sudo: required
+dist: trusty
+language: ruby
+
+before_install:
+before_install:
+- gem install asciidoctor -v 1.5.2
+- gem install tilt
+- sudo pip install git+https://github.com/gitenberg-dev/gitberg
+- sudo pip install pillow
+- sudo pip install cssutils
+- sudo pip install docutils
+- sudo pip install roman
+- sudo pip install git+https://github.com/gitenberg-dev/pg-epubmaker
+script:
+- VERSION=`ruby -e "require 'yaml'; meta = YAML.load_file('metadata.yaml'); puts meta['_version'];"`
+- git clone https://github.com/gitenberg-dev/asciidoctor-htmlbook.git
+- sudo pip install -r asciidoctor-htmlbook/gitberg-machine/requirements.txt
+
+- /usr/bin/python -c "from gitenberg import travis; travis.build_epub()"
+- ebook-convert book.epub book.mobi
+- xvfb-run ebook-convert book.epub book.pdf
+branches:
+  only:
+  - master
+notifications:
+  webhooks:
+    urls:
+      - https://unglue.it/api/travisci/webhook
+    on_success: always
+    on_failure: never
+    on_start: never
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: APzkO/aL6B87t2faqXN9hKaI+uUVx0VKik5Nk6JUubpQ/5iE3LYTlhmwWqQ4zP/Cbihdqz1dmLqJkJhovVyFhcWh1IICZ3bxaDpC5P/2taHkIZ4YofhrBUtr4g2aLq22UKW7uGE5+ag4RbneXGo96NrSW0vf9SoBNpEa/9DDYPgFJrdvhinvISq3B8lvhvZISUf6EqP/UQhyiuvkc0jku6NcK5eWuh+a+ucJ4988fabvAIVHbMPQvhQEiVWX02BWSxnzlzuWU77UYtGEMW9nj9NagMV7x4IhqPWGIwKI8Lx7aVp7tLJcsyqpHyBR/ejyOY3asvtBt7GIU47HxHaFICel+nOuAAuysguzP5qoc0PY+AJLSU8fp0ZTfuqvviD6jNEj18yCHVtw1O2op8HRYd5KvP9Fhuww2SH5U/f0g3KXRw1vkBXlZPUt7hcet9AxFIn2dVqPybAb4mvYK7DyahD5fOPQjvSx9x4Qhmoa73JEFQaYVduXrJ6dvL1oX1+93Od24IWl2JikGXt8fAhs+uz7IIn0fNIBavSvNj1g4WxSSFJB4kzD1cVwD77PsKNQAlVRxgCTjj314GkR2N1nevRlr5da/+emleBetzIu+FTqPsKcAQtSNFoO35g6eb8RxZAWu33IDSWET5V3FniUFdWrsPew+PAboIVIKSAXBxY=
+  file:
+    - book.epub
+    - book.mobi
+    - book.pdf
+  "on":
+    repo: GITenberg/Famous-Affinities-of-History--The-Romance-of-Devotion.-Volume-3_4691
+addons:
+  apt:
+    packages:
+    - xsltproc
+    - xvfb
+    - calibre
+    - python-pip
+    - git
+    - python-dev
+    - libjpeg-dev
+    - libpng-dev
+    - libfreetype6
+    - libfreetype6-dev
+    - zlib1g-dev
+    - python-lxml
+    - libxml2-dev
+    - libxslt1-dev
+    - tidy
